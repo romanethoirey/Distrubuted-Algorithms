@@ -39,6 +39,9 @@ public class Process extends UntypedAbstractActor{
             MyMessage m = (MyMessage) message;
 
             if(m.data.equals("Launch")) {
+
+                // start put op send message to other
+
                 log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with data: ["+m.data+"]");
             }
 
