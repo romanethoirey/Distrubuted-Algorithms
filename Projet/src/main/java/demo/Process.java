@@ -14,6 +14,7 @@ public class Process extends UntypedAbstractActor{
     private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
     private ArrayList<ActorRef> actorRefs = new ArrayList<>();
     private StampValue register;
+    private boolean active = true;
 
 
     public Process() {}
@@ -39,13 +40,14 @@ public class Process extends UntypedAbstractActor{
             MyMessage m = (MyMessage) message;
 
             if(m.data.equals("Launch")) {
-
+                active = true;
                 // start put op send message to other
 
                 log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with data: ["+m.data+"]");
             }
 
             if(m.data.equals("Crash")) {
+                active = false;
                 log.info("["+getSelf().path().name()+"] received message from ["+ getSender().path().name() +"] with data: ["+m.data+"]");
             }
 

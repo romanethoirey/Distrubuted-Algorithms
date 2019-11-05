@@ -26,12 +26,14 @@ public class Implementation {
             actorRefs.add(system.actorOf(Process.createActor(), "a"+i));
         }
 
+        // We send the list of actors to each actor
         for(int i = 0; i < actorRefs.size(); i++ ){
             actorRefs.get(i).tell(actorRefs, actorRefs.get(i));
         }
 
         sleepFor(1);
 
+        // We shuffle the list and split it in two lists : crash and launch
         int faulty = N / 2 ;
 
         Collections.shuffle(actorRefs);
