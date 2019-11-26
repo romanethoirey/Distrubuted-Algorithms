@@ -1,58 +1,54 @@
 package demo;
 
-import java.util.ArrayList;
-import java.util.Collections;
 
+import java.util.ArrayList;
+import java.util.Random;
+import demo.Process.CrashMSG;
+import demo.Process.LaunchMSG;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 /**
  * @author Romane THOIREY
  * @description
  */
 public class Implementation {
 
+    public static int N_PROCESS = 3;  // number of process
+    public static int M_OPERATIONS = 3; // number of get and put each process will make
+    public static int FAULTY; //number of crash allowed
+
+    public static ListofProcess list = new ListofProcess(new ArrayList<>()); //list of the process
+
+
     public static void main(String[] args) {
 
+        if(N_PROCESS%2==0)
+            FAULTY=N_PROCESS/2-1; //if the number of process is even F is N/2-1 (for 50 actors it will be 24)
+        else
+            FAULTY=N_PROCESS/2; //if the number of process is odd F will be N/2
+
         final ActorSystem system = ActorSystem.create("system");
-        final LoggingAdapter log = Logging.getLogger(system, "main");
 
-        ArrayList<ActorRef> actorRefs = new ArrayList<>();
-
-        // Instantiate N actors
-        int N = 5;
-        for(int i = 0; i < N; i++){
-            actorRefs.add(system.actorOf(Process.createActor(), "a"+i));
-        }
-
-        // We send the list of actors to each actor
-        for(int i = 0; i < actorRefs.size(); i++ ){
-            actorRefs.get(i).tell(actorRefs, actorRefs.get(i));
+        // Instantiate N_PROCESS
+        for(int i = 0; i < N_PROCESS; i++){
+            list.add(system.actorOf(Process.createActor(i), "Process"+Integer.toString(i)));
         }
 
         sleepFor(1);
 
         // We shuffle the list and split it in two lists : crash and launch
-        int faulty = N / 2 ;
 
-        Collections.shuffle(actorRefs);
-        ArrayList<ActorRef> crashList = new ArrayList<>();
-        for(int i = 0; i < faulty; i++) {
-            crashList.add(actorRefs.get(i));
-            actorRefs.remove(i);
+        Random rand = new Random();
+        //making randomly [0,n/2 process crash by sending them a CrashMSG
+        for(int i=0; i<FAULTY;i++) {
+            list.getList().get(rand.nextInt(N_PROCESS)).tell(new CrashMSG(),ActorRef.noSender());
+            //list.getList().get(i).tell(new CrashMSG(),ActorRef.noSender());
         }
 
-        // We say to remains process to Launch
-        Process.MyMessage launch = new Process.MyMessage("Launch");
-        for(int i = 0; i < actorRefs.size();  i++) {
-            actorRefs.get(i).tell(launch, actorRefs.get(i));
-        }
 
-        // We say to faulty process to do nothing with crash
-        Process.MyMessage crash = new Process.MyMessage("Crash");
-        for(int i = 0; i < crashList.size(); i++) {
-            actorRefs.get(i).tell(crash, actorRefs.get(i));
+        //launch every remaining process by sending them a LaunchMSG
+        for(int i=0; i<N_PROCESS;i++) {
+            list.getList().get(i).tell(new LaunchMSG(),ActorRef.noSender());
         }
 
 
