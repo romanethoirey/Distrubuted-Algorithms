@@ -134,7 +134,7 @@ public class Process extends UntypedAbstractActor {
 	private ArrayList msgs = new ArrayList();
 
 	// number of operations to perform
-	private final int M=10;
+	private final int M=100;
 
 	//number of operations performed so far
 	private int ops=1;

@@ -21,7 +21,7 @@ public class Main {
     
     public static void main(String[] args) {
 	
-	final int N_PROCESS=3;  // The system size
+	final int N_PROCESS=100;  // The system size
 	final int N_FAULTY = N_PROCESS%2 == 0 ? (N_PROCESS/2)-1 : N_PROCESS/2;
 	final int N_LAUNCH = N_PROCESS - N_FAULTY;
 
